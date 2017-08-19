@@ -4,7 +4,7 @@
 
 int main () {
 
-     int Indice, Vetor[N], Numeros_Medidas = 0, Vetor_Aux[N], Aux ;
+     int Indice, Vetor[N], Numeros_Medidas = 0, Aux ;
 
     printf("Digite quantos numeros voce quer armazenar: ");
     scanf("%d", &Numeros_Medidas);
