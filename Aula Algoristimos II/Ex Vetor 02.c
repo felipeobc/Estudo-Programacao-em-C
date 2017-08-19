@@ -18,14 +18,14 @@ int main () {
     for(Indice = Numeros_Medidas - 1; Indice >= 0; Indice--){
 
         Aux = Vetor[Indice];
-        Vetor[Indice] = Vetor_Aux[Indice - 1];
-        Vetor_Aux[Indice] = Aux;
+        Vetor[Indice] = Vetor[Indice - 1];
+        Vetor_Aux[Indice - 1] = Aux;
 
     }
     printf("Vetor Trocado: ");
-    for(Indice = 0 ; Indice < 0; Indice++){
+    for(Indice = 0 ; Indice < Numeros_Medidas; Indice++){
 
-        printf("%d ", Vetor_Aux[Indice]);
+        printf("%d ", Vetor[Indice]);
 
 
     }
@@ -33,5 +33,3 @@ int main () {
     system("pause");
     return 0;
 }
-
-
