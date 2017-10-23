@@ -1,12 +1,12 @@
 /*
-Modifique os algoritmos de ordenação bolha e inserção para contar quantas comparações são feitas durante a ordenação.
-Teste a sua modificação e conte quantas comparações são feitas para vetores de tamanho 10, 50, 100, 500, 1000, 5000, 10000, 50000 e 100000 números gerados aleatoriamente.
-Gere um gráfico tamanho do vetor x número de comparações.
-Qual dos dois algoritmos de ordenação é mais eficiente ?
-Qual tem melhor desempenho quando o vetor está ordenado ?
+Modifique os algoritmos de ordenaÃ§Ã£o bolha e inserÃ§Ã£o para contar quantas comparaÃ§Ãµes sÃ£o feitas durante a ordenaÃ§Ã£o.
+Teste a sua modificaÃ§Ã£o e conte quantas comparaÃ§Ãµes sÃ£o feitas para vetores de tamanho 10, 50, 100, 500, 1000, 5000, 10000, 50000 e 100000 nÃºmeros gerados aleatoriamente.
+Gere um grÃ¡fico tamanho do vetor x nÃºmero de comparaÃ§Ãµes.
+Qual dos dois algoritmos de ordenaÃ§Ã£o Ã© mais eficiente ?
+Qual tem melhor desempenho quando o vetor estÃ¡ ordenado ?
 */
 
-void BubbleSort(int *V, int N){ //Ordenação BubbleSort com a modificação.
+void BubbleSort(int *V, int N){ //OrdenaÃ§Ã£o BubbleSort com a modificaÃ§Ã£o.
     int i, Continua, Aux, Fim = N, Contador = 0;
     do{
         Continua = 0;
@@ -23,7 +23,7 @@ void BubbleSort(int *V, int N){ //Ordenação BubbleSort com a modificação.
     }while(Continua != 0);
     printf("Numeros de comparacoes BubbleSort: %d\n", Contador);
 }
-void InsertSort(int *V, int N){ //Ordenação InsertSort com a modificação.
+void InsertSort(int *V, int N){ //OrdenaÃ§Ã£o InsertSort com a modificaÃ§Ã£o.
     int i, j, Aux, Contador = 0;
     for(i = 1; i < N; i++){
         Aux = V[i];
@@ -101,9 +101,7 @@ int main(){
     Numeros_VetorAleatorios(Vetor2, Tamanho);
 
     BubbleSort(Vetor1, Tamanho);
-    BubbleSort(Vetor2, Tamanho);
 
-    InsertSort(Vetor1, Tamanho);
     InsertSort(Vetor2, Tamanho);
 
     Mostrar_Vetor(Vetor1, Tamanho);
