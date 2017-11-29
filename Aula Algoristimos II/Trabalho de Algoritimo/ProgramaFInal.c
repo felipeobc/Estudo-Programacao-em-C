@@ -10,7 +10,7 @@ typedef struct vetor_t{
 } * Vetor;
 typedef void (*AlgoritmoOrdenacao) (int*, int, int);
 
-void BubbleSort(int *V, int nao_usado, int N){ //Ordenação BubbleSort com a modificação.
+void BubbleSort(int *V, int nao_usado, int N){ //OrdenaÃ§Ã£o BubbleSort com a modificaÃ§Ã£o.
     int i, Continua, Aux, Fim = N;
     do{
         Continua = 0;
@@ -27,7 +27,7 @@ void BubbleSort(int *V, int nao_usado, int N){ //Ordenação BubbleSort com a modi
     }while(Continua != 0);
 
 }
-void InsertSort(int *V, int nao_usado, int N){ //Ordenação InsertSort com a modificação.
+void InsertSort(int *V, int nao_usado, int N){ //OrdenaÃ§Ã£o InsertSort com a modificaÃ§Ã£o.
     int i, j, Aux;
     for(i = 1; i < N; i++){
         Aux = V[i];
@@ -38,6 +38,9 @@ void InsertSort(int *V, int nao_usado, int N){ //Ordenação InsertSort com a modi
     }
 
 }
+
+//Felipe Oliveira Bueno de Camargo 
+//Renan
 void SelectioSort(int *V, int nao_usado, int N){
     int i ,j, menor, troca;
     for(i = 0; i < N-1; i++){
@@ -275,3 +278,6 @@ int main(){
     }while(condicao == 2);
 
 }
+//Felipe Oliveira Bueno de Camargo 
+//Renan Golcalves Pereira
+//Lucas...
