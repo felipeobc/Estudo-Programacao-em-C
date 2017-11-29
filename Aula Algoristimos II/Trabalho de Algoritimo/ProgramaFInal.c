@@ -39,8 +39,6 @@ void InsertSort(int *V, int nao_usado, int N){ //Ordenação InsertSort com a mo
 
 }
 
-//Felipe Oliveira Bueno de Camargo 
-//Renan
 void SelectioSort(int *V, int nao_usado, int N){
     int i ,j, menor, troca;
     for(i = 0; i < N-1; i++){
