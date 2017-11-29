@@ -279,5 +279,5 @@ int main(){
 
 }
 //Felipe Oliveira Bueno de Camargo 
-//Renan Golcalves Pereira
+//Renan Goncalves Pereira
 //Lucas...
