@@ -1,0 +1,175 @@
+Teste de programador C
+-----------------
+Um pacote debian com um pacote cliente-servidor está disponível para você.
+Ele contém o binário mt4_test_server e o binário mt4_test_client, ambos de 64 bits
+binários.
+
+Este pacote é para o Debian 8 (Jessie), mas você pode instalá-lo em outras versões
+também se você encontrar as dependências do pacote. Alternativamente, você pode
+extrair o seu conteúdo e trabalhar a partir daí, apenas certifique-se de que você tem libssl
+instalado porque depende dele para cálculos de hash MD5.
+
+O objetivo do teste é criar um proxy para agir como um homem no meio entre
+o servidor e o cliente. Este proxy não irá simplesmente encaminhar dados, mas
+aplicará algumas modificações aos dados antes de encaminhá-los. E opcionalmente
+registrar o fluxo de dados de cada sessão em um arquivo.
+
+NOTA: Toda a comunicação acontece localmente usando a interface localhost.
+
+Cliente e Servidor
+-----------------
+Servidor (mt4_test_server): O servidor liga-se à interface localhost em uma porta
+que é passado para ele através da linha de comando. Começa a ouvir a entrada
+conexões e pode aceitar várias conexões de vários clientes com
+nenhum limite imposto ao número de conexões que não sejam recursos da máquina.
+
+Client (mt4_test_client): O cliente se conecta ao servidor na porta passada
+para ele através da linha de comando. O cliente tem um comando quit que desconecta
+o cliente quando 'q' é pressionado.
+
+Os parâmetros de uso do cliente e do servidor são exibidos quando você executa
+eles.
+
+Comunicação entre servidor e cliente:
+----------------------------------------
+Aqui vou descrever as unidades de dados de pacotes (PDUs) enviadas e recebidas por ambos
+lados em uma sessão, informações mais detalhadas sobre as PDUs e seu conteúdo
+serão abordados na próxima seção.
+
+O cliente logo após a conexão envia uma PDU 'Authentication'. Esta PDU é
+analisada e mostrada no console do servidor.
+
+Segundo a segundo, o cliente envia uma PDU 'Mensagem'. Essas PDUs são
+analisada, validada (soma MD5 da mensagem) pelo servidor e mostrada em
+o console do servidor.
+
+Se o servidor não receber uma nova PDU (de qualquer tipo) após 30 segundos
+deixa cair a conexão.
+
+O servidor envia uma solicitação 'Ping' para clientes que não enviam nenhuma PDU
+no período de 1 segundo. O cliente retrocede e responde a ele com um
+PDU 'Pong'. Dessa forma, o servidor sabe que o cliente ainda está ativo.
+
+O servidor envia periodicamente uma PDU 'Configurações' aleatória para o cliente.
+O cliente simplesmente analisa essa PDU e exibe seu conteúdo.
+
+Se você quiser vê-los em ação, você pode rodar o servidor e conectar-se
+para ele usando o cliente diretamente.
+
+Unidades de dados de pacote (PDUs)
+------------------------
+Cada PDU vem com um opcode de 1 byte que indica que tipo de PDU
+estamos lidando. A ordem de bytes é BIG ENDIAN, então conversão de endianness
+é preciso.
+
+"Autenticação": (cliente para servidor)
+ * 1 byte: opcode 0x00
+ * 4 bytes: tamanho do nome de usuário
+ * N bytes: dados do nome de usuário
+ * 4 bytes: tamanho da senha
+ * N bytes: dados da senha
+ 
+ NOTA: N bytes significa que você deve usar o tamanho de leitura anterior (4 bytes) para
+ sabe quantos bytes para ler.
+
+"Ping": (servidor para cliente)
+ * 1 byte: opcode 0x01
+
+"Pong": (cliente para servidor)
+ * 1 byte: opcode 0x02
+
+"Mensagem": (cliente para servidor)
+ * 1 byte: opcode 0x03
+ * 16 bytes: hash md5 de dados da mensagem
+ * 4 bytes: tamanho da mensagem
+ * N bytes: dados da mensagem
+
+"Desconectar": (cliente para servidor)
+ * 1 byte: opcode 0x04
+
+"Configurações": (servidor para cliente)
+ * 1 byte: opcode 0x05
+ * 1 byte: dados de configurações
+
+ As informações do campo de dados de configurações são organizadas da seguinte maneira:
+ Alto baixo
+ + - + - + - + - + - + - + - + - +
+ | 7 | 6 | 5 | 4 | 3 | 2 | 1 | 0 |
+ + - + - + - + - + - + - + - + - +
+ 
+ Bits 7 a 3 = QPort (que pode armazenar um valor de 0 a 31)
+ Bit 2 = PW (1 = ligado ou 0 = desligado)
+ Bit 1 = TX (1 = ligado ou 0 = desligado)
+ Bit 0 = RX (1 = ligado ou 0 = desligado)
+ 
+O que o proxy precisa fazer:
+-------------------------------
+O proxy tem que trabalhar de forma transparente para os clientes, ele deve aceitar um
+número ilimitado de conexões como o servidor real, limitado apenas
+pelos recursos da máquina (memória, CPU, etc) e em cada conexão
+aceita dos clientes que irá abrir uma nova conexão para o destino
+servidor, dessa forma todas as comunicações entre o cliente e o servidor
+estará passando pelo proxy.
+
+O proxy deve iniciar com 2 parâmetros de linha de comando <proxy port> e
+<server port> onde <proxy port> é a porta em que o proxy irá escutar
+e esperar por conexões de entrada do cliente e <porta do servidor> é a porta do servidor
+onde queremos que o proxy se conecte a cada nova conexão de entrada do cliente.
+
+Todas as PDUs devem ser encaminhadas do servidor para o cliente e do
+cliente para o servidor. Algumas PDUs antes de serem encaminhadas devem ser modificadas
+a fim de atender aos requisitos deste teste. Outras PDUs podem ser
+encaminhado diretamente sem qualquer modificação.
+
+Aqui está a lista de PDUs que devem ser modificados e suas respectivas modificações
+regras:
+
+(1) PDU 'Authentication': Esta PDU proveniente do cliente deve ser modificada
+somente se o cliente enviar o nome de usuário 'gene' junto com a senha 'starwind',
+se esse for o caso, o nome de usuário deve ser alterado para 'jim' e a senha para
+'Hawking' antes de ser encaminhado.
+
+(2) PDU 'Message': esta PDU só será modificada se o
+mensagem de entrada é "CAST IN THE NAME OF GOD", nesse caso, a mensagem deve
+ser alterado para "YE NOT GUILTY XXXX" antes de ser encaminhado para o servidor.
+Onde 'XXXX' é uma cadeia alfanumérica aleatória ou 4 bytes. Por exemplo. "Você não é A2k9".
+
+(3) 'Configurações' PDU: Neste caso, existem duas regras:
+ - Se o campo TX for 1, o campo PW deve ser forçado para 0;
+ - Se o campo RX for 1, o QPort deve ser forçado a 31.
+
+Todas as outras PDUs podem passar pelo proxy sem qualquer modificação.
+
+NOTAS: (1) Não esqueça de redefinir o tamanho em bytes das strings
+           enviado para o servidor à medida que você os modifica. Isso pode causar o servidor
+           cair;
+
+       (2) Você pode usar qualquer técnica / arquitetura que você deseja criar o proxy:
+           multithreaded, singlethreaded, bifurcado, o que quer que seja;
+
+       (3) Você pode vincular qualquer biblioteca externa ao seu projeto, dado que o
+           biblioteca pode ser facilmente encontrada nos repositórios oficiais.
+
+Gravador de sessão (OPCIONAL)
+---------------------------
+Opcionalmente, você pode gravar os dados da sessão de cada cliente em um arquivo identificado
+pelo ID da sessão. O ID pode ser o que você quiser. E os dados registrados
+devem ser os dados sendo encaminhados para o cliente e para o servidor.
+
+Empacotando (no formato Debian) (NECESSÁRIO)
+---------------------------------------
+O pacote deve conter o binário do proxy e deve ser instalado em
+/ usr / bin.
+
+O pacote debian deve incluir as dependências necessárias para executar seu aplicativo,
+ie. se o seu aplicativo depender da libssl, inclua-o como uma dependência do controle
+arquivo do seu pacote.
+
+Arquivos de Origem (REQUIRED)
+-----------------------
+Os arquivos de origem devem ser entregues em um arquivo tar.gz com suas instruções de compilação.
+É uma vantagem se você usar um sistema de criação como autotools, cmake, meson, ninja,
+qmake, etc, ou se você pode criar seu próprio Makefile manualmente.
+
+Isso é tudo.
+Boa sorte.
